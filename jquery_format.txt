@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+
+.done{
+
+    text-decoration:line-through;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<input type="text" id="task">
+
+<button id="add">
+
+Add
+
+</button>
+
+<ul id="list"></ul>
+
+<script>
+
+/* ADD */
+
+$("#add").click(function(){
+
+    var t = $("#task").val();
+
+    $("#list").append(
+
+    "<li>"+t+
+
+    " <button class='remove'>Remove</button></li>"
+
+    );
+
+    $("li:last").hide().fadeIn();
+
+});
+
+/* REMOVE */
+
+$(document).on("click",".remove",function(){
+
+    $(this).parent().fadeOut();
+
+});
+
+/* COMPLETE */
+
+$(document).on("click","li",function(){
+
+    $(this).toggleClass("done");
+
+});
+
+</script>
+
+</body>
+
+</html>
