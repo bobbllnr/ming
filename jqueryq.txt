@@ -1,0 +1,312 @@
+Q1,Q2,Q4,Q6-Q9
+Q1: Dynamic To-Do List with jQuery
+File Name: index.html
+Code:
+<!DOCTYPE html>
+<html>
+<head>
+  <title>To-Do List</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .done { text-decoration: line-through; color: gray; }
+  </style>
+</head>
+<body>
+  <h2>To-Do List</h2>
+  <input type="text" id="taskInput" placeholder="Enter task">
+  <button id="addBtn">Add</button>
+  <ul id="taskList"></ul>
+  <script>
+    $("#addBtn").click(function () {
+      var task = $("#taskInput").val().trim();
+      if (task === "") return;
+      var li = $('<li>' + task + ' <button class="remove">Remove</button></li>');
+      li.hide();
+      $("#taskList").append(li);
+      li.fadeIn();
+      $("#taskInput").val("");
+    });
+    $("#taskList").on("click", ".remove", function () {
+      $(this).parent().fadeOut(function () { $(this).remove(); });
+    });
+    $("#taskList").on("click", "li", function (e) {
+      if (!$(e.target).hasClass("remove")) {
+        $(this).toggleClass("done");
+      }
+    });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser.
+
+
+Q2: Interactive Image Slider with Auto-Play
+File Name: index.html
+Code:
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Slider</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    #slider { position: relative; width: 400px; height: 250px; }
+    .slide { position: absolute; display: none; width: 100%; height: 100%; }
+    .slide:first-child { display: block; }
+    img { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <h2>Image Slider</h2>
+  <div id="slider">
+    <div class="slide"><img src="https://picsum.photos/400/250?random=1"></div>
+    <div class="slide"><img src="https://picsum.photos/400/250?random=2"></div>
+    <div class="slide"><img src="https://picsum.photos/400/250?random=3"></div>
+  </div>
+  <button id="prev">Previous</button>
+  <button id="next">Next</button>
+  <script>
+    var slides = $(".slide");
+    var current = 0;
+    var timer;
+    function showSlide(n) {
+      slides.eq(current).fadeOut();
+      current = (n + slides.length) % slides.length;
+      slides.eq(current).fadeIn();
+    }
+    function startAuto() {
+      timer = setInterval(function () { showSlide(current + 1); }, 3000);
+    }
+    startAuto();
+    $("#slider").hover(function () {
+      clearInterval(timer);
+    }, function () {
+      startAuto();
+    });
+    $("#next").click(function () { showSlide(current + 1); });
+    $("#prev").click(function () { showSlide(current - 1); });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser (internet required for images and jQuery CDN).
+
+
+Q4: Dynamic FAQ Accordion
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FAQ Accordion</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .question { cursor: pointer; padding: 10px; background: #eee; margin-top: 5px; }
+    .question.active { background: #aad4f5; }
+    .answer { display: none; padding: 10px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h2>FAQ</h2>
+  <div class="question">What is HTML?</div>
+  <div class="answer">HTML stands for HyperText Markup Language.</div>
+  <div class="question">What is CSS?</div>
+  <div class="answer">CSS stands for Cascading Style Sheets.</div>
+  <div class="question">What is JavaScript?</div>
+  <div class="answer">JavaScript is a scripting language for web pages.</div>
+  <script>
+    $(".question").click(function () {
+      $(".question").not(this).removeClass("active").next(".answer").slideUp();
+      $(this).toggleClass("active").next(".answer").slideToggle();
+    });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser.
+
+
+Q6: Drag-and-Drop Shopping Cart
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping Cart</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <style>
+    .product { display: inline-block; padding: 10px; margin: 5px; background: #f0f0f0; border: 1px solid #aaa; cursor: grab; }
+    #cart { min-height: 80px; border: 2px dashed #888; padding: 10px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Products</h2>
+  <div id="products">
+    <div class="product" data-name="Mobile - Rs.10000">Mobile</div>
+    <div class="product" data-name="Laptop - Rs.50000">Laptop</div>
+    <div class="product" data-name="Tablet - Rs.20000">Tablet</div>
+  </div>
+  <h2>Cart</h2>
+  <div id="cart"><p id="cartMsg">Drop items here</p></div>
+  <script>
+    $(".product").draggable({ helper: "clone", revert: "invalid" });
+    $("#cart").droppable({
+      drop: function (event, ui) {
+        var name = ui.draggable.data("name");
+        $("#cartMsg").hide();
+        var item = $("<div>" + name + "</div>").hide();
+        $("#cart").append(item);
+        item.slideDown();
+      }
+    });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser (internet required for CDN).
+
+
+Q7: Dynamic Progress Bar for File Upload
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Upload Progress</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    #bar-container { width: 300px; background: #ddd; height: 25px; margin-top: 10px; }
+    #bar { width: 0; height: 25px; background: green; }
+  </style>
+</head>
+<body>
+  <h2>File Upload Simulator</h2>
+  <button id="uploadBtn">Upload</button>
+  <div id="bar-container"><div id="bar"></div></div>
+  <div id="msg" style="display:none; color:green; margin-top:10px;">Upload Complete!</div>
+  <script>
+    $("#uploadBtn").click(function () {
+      $("#bar").stop().css("width", "0");
+      $("#msg").hide();
+      $("#bar").animate({ width: "300px" }, 5000, function () {
+        $("#msg").fadeIn();
+      });
+    });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser.
+
+
+Q8: Interactive Quiz with Timer
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz App</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h2>Quiz</h2>
+  <div id="quiz">
+    <p id="question"></p>
+    <div id="options"></div>
+    <p>Time Left: <span id="time">10</span>s</p>
+  </div>
+  <div id="result" style="display:none;"></div>
+  <script>
+    var questions = [
+      { q: "Capital of India?", options: ["Mumbai", "Delhi", "Chennai"], ans: "Delhi" },
+      { q: "2 + 2 = ?", options: ["3", "4", "5"], ans: "4" },
+      { q: "Full form of HTML?", options: ["Hyper Text Markup Language", "High Text Machine Language", "None"], ans: "Hyper Text Markup Language" }
+    ];
+    var current = 0, score = 0, timer;
+    function loadQuestion() {
+      clearInterval(timer);
+      if (current >= questions.length) {
+        $("#quiz").fadeOut(function () {
+          $("#result").html("<h3>Your Score: " + score + "/" + questions.length + "</h3>").fadeIn();
+        });
+        return;
+      }
+      var timeLeft = 10;
+      var q = questions[current];
+      $("#question").html("<b>Q" + (current + 1) + ": " + q.q + "</b>");
+      $("#options").empty();
+      q.options.forEach(function (opt) {
+        var btn = $('<button style="margin:5px;">' + opt + '</button>');
+        btn.click(function () {
+          clearInterval(timer);
+          if (opt === q.ans) score++;
+          current++;
+          loadQuestion();
+        });
+        $("#options").append(btn);
+      });
+      $("#time").text(timeLeft);
+      timer = setInterval(function () {
+        timeLeft--;
+        $("#time").text(timeLeft);
+        if (timeLeft <= 0) { clearInterval(timer); current++; loadQuestion(); }
+      }, 1000);
+    }
+    loadQuestion();
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser.
+
+
+Q9: Animated Login/Signup Form Toggle
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login / Signup</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div id="loginForm">
+    <h2>Login</h2>
+    <input type="text" id="lemail" placeholder="Email"><br><br>
+    <input type="password" id="lpass" placeholder="Password"><br><br>
+    <button id="loginBtn">Login</button>
+    <p id="lerr" style="color:red; display:none;">Please fill all fields with valid email.</p>
+    <p>New user? <a href="#" id="showSignup">Sign Up</a></p>
+  </div>
+  <div id="signupForm" style="display:none;">
+    <h2>Sign Up</h2>
+    <input type="text" id="sname" placeholder="Name"><br><br>
+    <input type="text" id="semail" placeholder="Email"><br><br>
+    <input type="password" id="spass" placeholder="Password"><br><br>
+    <button id="signupBtn">Register</button>
+    <p id="serr" style="color:red; display:none;">Please fill all fields with valid email.</p>
+    <p>Already registered? <a href="#" id="showLogin">Login</a></p>
+  </div>
+  <script>
+    $("#showSignup").click(function (e) {
+      e.preventDefault();
+      $("#loginForm").slideToggle();
+      $("#signupForm").slideToggle();
+    });
+    $("#showLogin").click(function (e) {
+      e.preventDefault();
+      $("#signupForm").slideToggle();
+      $("#loginForm").slideToggle();
+    });
+    $("#loginBtn").click(function () {
+      var e = $("#lemail").val(), p = $("#lpass").val();
+      if (!e || !p || !e.includes("@")) { $("#lerr").show(); }
+      else { alert("Login successful!"); }
+    });
+    $("#signupBtn").click(function () {
+      var n = $("#sname").val(), e = $("#semail").val(), p = $("#spass").val();
+      if (!n || !e || !p || !e.includes("@")) { $("#serr").show(); }
+      else { alert("Registered successfully!"); }
+    });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser.

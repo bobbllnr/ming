@@ -1,0 +1,645 @@
+Q3,Q5,Q20-Q29
+Q3: Real-Time Username Availability Checker
+File Names: index.html, check.php
+index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Username Checker</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h2>Sign Up</h2>
+  <label>Username: <input type="text" id="username"></label>
+  <div id="status" style="display:none; margin-top:5px;"></div>
+  <script>
+    $("#username").on("keyup", function () {
+      var username = $(this).val().trim();
+      if (username === "") { $("#status").hide(); return; }
+      $.post("check.php", { username: username }, function (data) {
+        $("#status").hide().html(data).slideDown();
+      });
+    });
+  </script>
+</body>
+</html>
+check.php
+<?php
+$taken = ["admin", "user", "john", "test", "root"];
+$username = $_POST['username'] ?? '';
+if (in_array(strtolower($username), $taken)) {
+    echo '<span style="color:red;">Taken</span>';
+} else {
+    echo '<span style="color:green;">Available</span>';
+}
+?>
+How to Run:
+1.	Place both files in your XAMPP/WAMP htdocs folder.
+2.	Start Apache, open http://localhost/index.html.
+
+
+Q5: AJAX-Based Live Search Filter
+File Names: index.html, products.json
+index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Search</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h2>Product Search</h2>
+  <input type="text" id="search" placeholder="Search products...">
+  <ul id="results"></ul>
+  <script>
+    $("#search").on("keyup", function () {
+      var query = $(this).val().trim().toLowerCase();
+      if (query === "") { $("#results").empty(); return; }
+      $.get("products.json", function (data) {
+        var filtered = data.filter(item => item.toLowerCase().includes(query));
+        $("#results").empty();
+        if (filtered.length === 0) {
+          $("#results").append("<li>No results found</li>");
+        } else {
+          filtered.forEach(function (item) {
+            var li = $("<li>" + item + "</li>").hide();
+            $("#results").append(li);
+            li.fadeIn();
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+products.json
+["Mobile", "Laptop", "Tablet", "Monitor", "Keyboard", "Mouse", "Headphones", "Printer", "Camera", "Speaker"]
+How to Run:
+1.	Place both files in htdocs (XAMPP) and start Apache.
+2.	Open http://localhost/index.html.
+
+
+Q20: Weather App with AJAX (Vanilla JS)
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head><title>Weather App</title></head>
+<body>
+  <h2>Weather App</h2>
+  <input type="text" id="city" placeholder="Enter city name">
+  <button onclick="getWeather()">Search</button>
+  <div id="result"></div>
+  <div id="error" style="color:red;"></div>
+  <script>
+    var API_KEY = "YOUR_API_KEY"; // Replace with your OpenWeatherMap API key
+    function getWeather() {
+      var city = document.getElementById("city").value.trim();
+      if (!city) return;
+      document.getElementById("result").innerHTML = "";
+      document.getElementById("error").innerHTML = "";
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + API_KEY + "&units=metric", true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          var data = JSON.parse(xhr.responseText);
+          document.getElementById("result").innerHTML =
+            "<p>Temperature: " + data.main.temp + "°C</p>" +
+            "<p>Humidity: " + data.main.humidity + "%</p>" +
+            "<p>Condition: " + data.weather[0].description + "</p>" +
+            "<p>Wind Speed: " + data.wind.speed + " m/s</p>";
+        } else {
+          document.getElementById("error").innerHTML = "City not found or API error.";
+        }
+      };
+      xhr.onerror = function () {
+        document.getElementById("error").innerHTML = "Network error. Please try again.";
+      };
+      xhr.send();
+    }
+  </script>
+</body>
+</html>
+How to Run:
+1.	Get a free API key from openweathermap.org.
+2.	Replace YOUR_API_KEY in the code.
+3.	Open index.html in any browser.
+
+
+Q21: Live User Search (Vanilla JS + AJAX)
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head><title>Live User Search</title>
+<style>
+  #dropdown { border: 1px solid #ccc; max-width: 300px; display: none; }
+  #dropdown div { padding: 5px; cursor: pointer; }
+  #dropdown div:hover { background: #eee; }
+</style>
+</head>
+<body>
+  <h2>Live User Search</h2>
+  <input type="text" id="searchBox" placeholder="Type a name..." oninput="searchUsers(this.value)">
+  <div id="loading" style="display:none;">Loading...</div>
+  <div id="dropdown"></div>
+  <script>
+    function searchUsers(query) {
+      if (query.trim() === "") {
+        document.getElementById("dropdown").style.display = "none";
+        return;
+      }
+      document.getElementById("loading").style.display = "block";
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://jsonplaceholder.typicode.com/users", true);
+      xhr.onload = function () {
+        document.getElementById("loading").style.display = "none";
+        if (xhr.status === 200) {
+          var users = JSON.parse(xhr.responseText);
+          var filtered = users.filter(u => u.name.toLowerCase().includes(query.toLowerCase()));
+          var dropdown = document.getElementById("dropdown");
+          dropdown.innerHTML = "";
+          if (filtered.length === 0) {
+            dropdown.innerHTML = "<div>No results found</div>";
+          } else {
+            filtered.forEach(function (u) {
+              dropdown.innerHTML += "<div>" + u.name + "</div>";
+            });
+          }
+          dropdown.style.display = "block";
+        } else {
+          document.getElementById("dropdown").innerHTML = "<div>API error</div>";
+        }
+      };
+      xhr.onerror = function () {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("dropdown").innerHTML = "<div>Network error</div>";
+      };
+      xhr.send();
+    }
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser (internet required).
+
+
+Q22: Dynamic To-Do List (AJAX + DOM Manipulation)
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head><title>AJAX To-Do List</title>
+<style>
+  #spinner { display: none; }
+</style>
+</head>
+<body>
+  <h2>To-Do List</h2>
+  <input type="text" id="newTask" placeholder="Enter new task">
+  <button onclick="addTask()">Add</button>
+  <div id="spinner">Loading...</div>
+  <ul id="taskList"></ul>
+  <script>
+    window.onload = function () {
+      showSpinner(true);
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://jsonplaceholder.typicode.com/todos?_limit=5", true);
+      xhr.onload = function () {
+        showSpinner(false);
+        if (xhr.status === 200) {
+          var tasks = JSON.parse(xhr.responseText);
+          tasks.forEach(function (t) { appendTask(t.id, t.title); });
+        }
+      };
+      xhr.send();
+    };
+    function appendTask(id, title) {
+      var li = document.createElement("li");
+      li.id = "task-" + id;
+      li.innerHTML = title + ' <button onclick="deleteTask(' + id + ')">Delete</button>';
+      document.getElementById("taskList").appendChild(li);
+    }
+    function addTask() {
+      var title = document.getElementById("newTask").value.trim();
+      if (!title) return;
+      showSpinner(true);
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://jsonplaceholder.typicode.com/todos", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onload = function () {
+        showSpinner(false);
+        if (xhr.status === 201) {
+          var task = JSON.parse(xhr.responseText);
+          appendTask(task.id, title);
+          document.getElementById("newTask").value = "";
+        }
+      };
+      xhr.send(JSON.stringify({ title: title, completed: false }));
+    }
+    function deleteTask(id) {
+      showSpinner(true);
+      var xhr = new XMLHttpRequest();
+      xhr.open("DELETE", "https://jsonplaceholder.typicode.com/todos/" + id, true);
+      xhr.onload = function () {
+        showSpinner(false);
+        var el = document.getElementById("task-" + id);
+        if (el) el.remove();
+      };
+      xhr.send();
+    }
+    function showSpinner(show) {
+      document.getElementById("spinner").style.display = show ? "block" : "none";
+    }
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser (internet required).
+
+
+Q23: Country-State-City Dropdown
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head><title>Cascading Dropdown</title></head>
+<body>
+  <h2>Country - State - City</h2>
+  Country:
+  <select id="country" onchange="loadStates()">
+    <option value="">--Select--</option>
+    <option value="India">India</option>
+    <option value="USA">USA</option>
+  </select>
+  State:
+  <select id="state" onchange="loadCities()">
+    <option value="">--Select--</option>
+  </select>
+  City:
+  <select id="city">
+    <option value="">--Select--</option>
+  </select>
+  <p id="error" style="color:red;"></p>
+  <script>
+    var data = {
+      India: {
+        Maharashtra: ["Mumbai", "Pune", "Nagpur"],
+        Karnataka: ["Bangalore", "Mysore"]
+      },
+      USA: {
+        California: ["Los Angeles", "San Francisco"],
+        Texas: ["Houston", "Dallas"]
+      }
+    };
+    function loadStates() {
+      var country = document.getElementById("country").value;
+      var stateSelect = document.getElementById("state");
+      var citySelect = document.getElementById("city");
+      stateSelect.innerHTML = "<option value=''>--Select--</option>";
+      citySelect.innerHTML = "<option value=''>--Select--</option>";
+      document.getElementById("error").innerText = "";
+      if (!country) return;
+      var states = data[country];
+      if (!states) { document.getElementById("error").innerText = "No states found."; return; }
+      for (var s in states) {
+        stateSelect.innerHTML += "<option value='" + s + "'>" + s + "</option>";
+      }
+    }
+    function loadCities() {
+      var country = document.getElementById("country").value;
+      var state = document.getElementById("state").value;
+      var citySelect = document.getElementById("city");
+      citySelect.innerHTML = "<option value=''>--Select--</option>";
+      if (!state) return;
+      var cities = data[country][state];
+      cities.forEach(function (c) {
+        citySelect.innerHTML += "<option value='" + c + "'>" + c + "</option>";
+      });
+    }
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser.
+
+
+Q24: Login Form with AJAX
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head><title>AJAX Login</title></head>
+<body>
+  <h2>Login</h2>
+  <input type="text" id="email" placeholder="Email"><br><br>
+  <input type="password" id="password" placeholder="Password"><br><br>
+  <button onclick="doLogin()">Login</button>
+  <div id="loading" style="display:none;">Loading...</div>
+  <div id="msg"></div>
+  <script>
+    function doLogin() {
+      var email = document.getElementById("email").value.trim();
+      var pass = document.getElementById("password").value.trim();
+      var msg = document.getElementById("msg");
+      msg.innerText = "";
+      if (!email || !pass) { msg.style.color = "red"; msg.innerText = "All fields required."; return; }
+      var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) { msg.style.color = "red"; msg.innerText = "Invalid email format."; return; }
+      document.getElementById("loading").style.display = "block";
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://jsonplaceholder.typicode.com/posts", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onload = function () {
+        document.getElementById("loading").style.display = "none";
+        if (xhr.status === 201) {
+          // Simulate: admin@test.com / 1234 is valid
+          if (email === "admin@test.com" && pass === "1234") {
+            msg.style.color = "green"; msg.innerText = "Login successful!";
+          } else {
+            msg.style.color = "red"; msg.innerText = "Invalid credentials.";
+          }
+        } else {
+          msg.style.color = "red"; msg.innerText = "Server error.";
+        }
+      };
+      xhr.onerror = function () {
+        document.getElementById("loading").style.display = "none";
+        msg.style.color = "red"; msg.innerText = "Network error.";
+      };
+      xhr.send(JSON.stringify({ email: email, password: pass }));
+    }
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser.
+2.	Use admin@test.com / 1234 to simulate a successful login.
+
+
+Q25: Comment System (AJAX + DOM Updates)
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head><title>Comment System</title>
+<style>
+  .comment { border: 1px solid #ccc; padding: 8px; margin: 5px 0; display: none; }
+</style>
+</head>
+<body>
+  <h2>Comments</h2>
+  <textarea id="commentBox" placeholder="Write a comment..." rows="3" cols="40"></textarea><br>
+  <button onclick="postComment()">Post Comment</button>
+  <p id="err" style="color:red; display:none;">Comment cannot be empty.</p>
+  <h3>All Comments</h3>
+  <div id="comments"></div>
+  <script>
+    window.onload = function () {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://jsonplaceholder.typicode.com/comments?_limit=5", true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          var comments = JSON.parse(xhr.responseText);
+          comments.forEach(function (c) { showComment(c.name, c.body); });
+        }
+      };
+      xhr.send();
+    };
+    function showComment(name, body) {
+      var div = document.createElement("div");
+      div.className = "comment";
+      div.innerHTML = "<b>" + name + "</b><p>" + body + "</p>";
+      document.getElementById("comments").prepend(div);
+      div.style.display = "none";
+      setTimeout(function () {
+        div.style.display = "block";
+        div.style.opacity = 0;
+        var op = 0;
+        var fade = setInterval(function () {
+          op += 0.1;
+          div.style.opacity = op;
+          if (op >= 1) clearInterval(fade);
+        }, 30);
+      }, 10);
+    }
+    function postComment() {
+      var text = document.getElementById("commentBox").value.trim();
+      document.getElementById("err").style.display = text ? "none" : "block";
+      if (!text) return;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://jsonplaceholder.typicode.com/comments", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onload = function () {
+        if (xhr.status === 201) {
+          showComment("You", text);
+          document.getElementById("commentBox").value = "";
+        }
+      };
+      xhr.send(JSON.stringify({ name: "You", body: text }));
+    }
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser (internet required).
+
+Q26: Animated News Feed (jQuery + AJAX)
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>News Feed</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .news-item { border: 1px solid #ccc; padding: 8px; margin: 5px 0; display: none; }
+  </style>
+</head>
+<body>
+  <h2>News Feed</h2>
+  <button id="refreshBtn">Refresh News</button>
+  <div id="spinner" style="display:none;">Loading...</div>
+  <div id="newsFeed"></div>
+  <script>
+    var mockNews = [
+      { title: "Tech Giants Report Record Profits", desc: "Major tech companies exceed expectations." },
+      { title: "New AI Model Released", desc: "A new AI model surpasses previous benchmarks." },
+      { title: "Stock Market Update", desc: "Markets rise sharply after economic data." },
+      { title: "Sports: World Cup Highlights", desc: "Teams advance to the quarterfinals." },
+      { title: "Climate Summit Begins", desc: "World leaders gather to discuss climate change." }
+    ];
+    function loadNews() {
+      $("#spinner").show();
+      $("#newsFeed").empty();
+      setTimeout(function () {
+        $("#spinner").hide();
+        $.each(mockNews, function (i, item) {
+          var div = $('<div class="news-item"><b>' + item.title + '</b><p>' + item.desc + '</p></div>');
+          $("#newsFeed").append(div);
+          div.delay(i * 300).slideDown();
+        });
+      }, 800);
+    }
+    loadNews();
+    $("#refreshBtn").click(function () { loadNews(); });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser.
+
+Q27: Shopping Cart (AJAX + jQuery Animations)
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping Cart</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h2>Products</h2>
+  <div id="products">Loading...</div>
+  <h2>Cart</h2>
+  <div id="cart"></div>
+  <p>Total: ₹<span id="total">0</span></p>
+  <script>
+    var total = 0;
+    var prices = { 1: 100, 2: 200, 3: 300 };
+    $.get("https://jsonplaceholder.typicode.com/posts?_limit=3", function (data) {
+      var html = "";
+      data.forEach(function (p) {
+        html += '<div><b>Product ' + p.id + '</b> - ₹' + prices[p.id] +
+          ' <button class="add-btn" data-id="' + p.id + '" data-price="' + prices[p.id] + '">Add to Cart</button></div>';
+      });
+      $("#products").html(html);
+    });
+    $(document).on("click", ".add-btn", function () {
+      var id = $(this).data("id");
+      var price = $(this).data("price");
+      total += price;
+      $("#total").text(total);
+      var item = $("<div>Product " + id + " - ₹" + price +
+        " <button class='remove-btn' data-price='" + price + "'>Remove</button></div>").hide();
+      $("#cart").append(item);
+      item.fadeIn();
+      $.post("https://jsonplaceholder.typicode.com/posts", { productId: id });
+    });
+    $(document).on("click", ".remove-btn", function () {
+      var price = $(this).data("price");
+      total -= price;
+      $("#total").text(total);
+      $(this).parent().fadeOut(function () { $(this).remove(); });
+    });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser (internet required).
+
+Q28: Infinite Scroll (jQuery + AJAX)
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Infinite Scroll</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .post { border: 1px solid #ccc; padding: 8px; margin: 5px 0; display: none; }
+  </style>
+</head>
+<body>
+  <h2>Posts</h2>
+  <div id="posts"></div>
+  <div id="loader" style="display:none;">Loading...</div>
+  <script>
+    var page = 1;
+    var loading = false;
+    function loadPosts() {
+      if (loading) return;
+      loading = true;
+      $("#loader").show();
+      $.get("https://jsonplaceholder.typicode.com/posts?_page=" + page + "&_limit=5", function (data) {
+        data.forEach(function (post) {
+          var div = $('<div class="post"><b>' + post.title + '</b><p>' + post.body + '</p></div>');
+          $("#posts").append(div);
+          div.fadeIn();
+        });
+        page++;
+        loading = false;
+        $("#loader").hide();
+      });
+    }
+    loadPosts();
+    $(window).scroll(function () {
+      if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+        loadPosts();
+      }
+    });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser (internet required).
+2.	Scroll down to load more posts.
+
+Q29: Interactive Poll System (AJAX + Real-Time Updates)
+File Name: index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Poll System</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    .bar { height: 20px; background: steelblue; }
+  </style>
+</head>
+<body>
+  <h2>Poll: What is your favorite programming language?</h2>
+  <div id="pollOptions"></div>
+  <button id="voteBtn">Vote</button>
+  <p id="msg" style="color:red; display:none;">You have already voted!</p>
+  <h3>Results</h3>
+  <div id="results"></div>
+  <script>
+    var poll = {
+      question: "Favorite Language?",
+      options: [
+        { id: 1, label: "JavaScript", votes: 10 },
+        { id: 2, label: "Python", votes: 8 },
+        { id: 3, label: "PHP", votes: 5 }
+      ]
+    };
+    function renderOptions() {
+      var html = "";
+      poll.options.forEach(function (opt) {
+        html += '<label><input type="radio" name="poll" value="' + opt.id + '"> ' + opt.label + '</label><br>';
+      });
+      $("#pollOptions").html(html);
+    }
+    function renderResults() {
+      var html = "";
+      poll.options.forEach(function (opt) {
+        html += '<div>' + opt.label + ': ' + opt.votes + ' votes<br>' +
+          '<div class="bar" style="width:' + (opt.votes * 10) + 'px;"></div></div><br>';
+      });
+      $("#results").hide().html(html).slideDown();
+    }
+    renderOptions();
+    renderResults();
+    $("#voteBtn").click(function () {
+      if (localStorage.getItem("voted")) {
+        $("#msg").show();
+        return;
+      }
+      var selected = $("input[name='poll']:checked").val();
+      if (!selected) { alert("Please select an option."); return; }
+      $.post("https://jsonplaceholder.typicode.com/posts", { vote: selected }, function () {
+        poll.options.forEach(function (opt) {
+          if (opt.id == selected) opt.votes++;
+        });
+        localStorage.setItem("voted", "true");
+        renderResults();
+        $("input[name='poll']").prop("disabled", true);
+        $("#voteBtn").prop("disabled", true);
+      });
+    });
+  </script>
+</body>
+</html>
+How to Run:
+1.	Open index.html in any browser (internet required).
+2.	To reset vote, clear localStorage from browser DevTools → Application → Local Storage.
